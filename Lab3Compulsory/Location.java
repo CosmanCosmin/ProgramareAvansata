@@ -1,7 +1,7 @@
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Location {
+public abstract class Location implements Comparable<Location> {
     private String name;
     private Map<Location, Time> travelTimes;
     public Location(String name){
@@ -22,5 +22,9 @@ public abstract class Location {
     }
     public void addTravelTime(Location location, Time time){
         travelTimes.put(location, time);
+    }
+    @Override
+    public int compareTo(Location o) {
+        return name.compareTo(getName());
     }
 }
