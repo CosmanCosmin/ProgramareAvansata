@@ -1,9 +1,11 @@
+import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Location {
     private String name;
     private Map<Location, Time> travelTimes;
     public Location(String name){
+        travelTimes = new HashMap<>();
         this.name = name;
     }
     public void setName(String name) {
