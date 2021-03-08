@@ -1,0 +1,5 @@
+Create an object-oriented model of the problem. You should have at least the following classes: Student, School and the main class.
+Create all the objects in the example using streams.
+Create a list of students, using LinkedList implementation. Sort the students, using a comparator.
+Create a set of schools, using a TreeSet implementation. Make sure that School objects are comparable.
+Create two maps (having different implementations) describing the students and the school preferences and print them on the screen.
