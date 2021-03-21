@@ -53,7 +53,7 @@ public class Main {
                     Command loadCommand = new LoadCommand(catalog, loadPath);
                     break;
                 case "report":
-                    System.out.println("Not yet!");
+                    Command reportCommand = new ReportCommand(catalog);
                     break;
                 case "exit":
                     break;
