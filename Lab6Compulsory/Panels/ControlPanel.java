@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 import java.io.*;
 
 public class ControlPanel extends JPanel {
@@ -42,12 +43,12 @@ public class ControlPanel extends JPanel {
         }
     }
     private void load(ActionEvent e){
-        //todo fix : can't draw after loading an image
         JFileChooser jFileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         int result = jFileChooser.showOpenDialog(null);
         if (result == JFileChooser.APPROVE_OPTION){
             try {
-                frame.canvas.image = ImageIO.read(jFileChooser.getSelectedFile());
+                BufferedImage image = ImageIO.read(jFileChooser.getSelectedFile());
+                frame.canvas.graphics.drawImage(image, 0,0,this);
                 frame.canvas.updateUI();
             }
             catch (IOException ex){
