@@ -57,10 +57,12 @@ public class ControlPanel extends JPanel {
         }
     }
     private void reset(ActionEvent e){
+        Color oldColor = frame.canvas.graphics.getColor();
         frame.canvas.graphics.setColor(Color.WHITE);
         frame.canvas.graphics.fillRect(0,0, frame.getWidth(), frame.getHeight());
         frame.canvas.updateUI();
         frame.canvas.shapes.clear();
+        frame.canvas.graphics.setColor(oldColor);
     }
     private void exit(ActionEvent e){
         System.exit(0);

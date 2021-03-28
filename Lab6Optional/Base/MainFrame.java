@@ -11,6 +11,7 @@ public class MainFrame extends JFrame {
     public DrawingPanel canvas;
     public ShapePanel shapeChooser;
     public boolean delete = false;
+    public boolean freeMode = false;
     private void init(){
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         canvas = new DrawingPanel(this);

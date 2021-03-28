@@ -1,12 +1,13 @@
 package Panels;
 
 import Base.MainFrame;
-import Shapes.RegularPolygon;
+import Shapes.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ public class DrawingPanel extends JPanel {
     public BufferedImage image;
     public Graphics2D graphics;
     public List<Shape> shapes;
+    private int currentX, currentY, oldX, oldY;
     public DrawingPanel(MainFrame frame) {
         this.frame = frame;
         createOffscreenImage();
@@ -35,22 +37,50 @@ public class DrawingPanel extends JPanel {
         setBorder(BorderFactory.createEtchedBorder());
         this.addMouseListener(new MouseAdapter() {
             @Override
-            public void mousePressed(MouseEvent e){
-                if(!frame.delete) {
-                    drawShape(e.getX(), e.getY());
+            public void mousePressed(MouseEvent e) {
+                if (!frame.freeMode){
+                    if (!frame.delete) {
+                        drawShape(e.getX(), e.getY());
+                    } else {
+                        graphics.setColor(Color.WHITE);
+                        for (int index = shapes.size() - 1; index >= 0; index--) {
+                            if (shapes.get(index).contains(e.getX(), e.getY())) {
+                                graphics.fill(shapes.get(index));
+                                shapes.remove(index);
+                                break;
+                            }
+                        }
+                        redrawShapes();
+                    }
+                    repaint();
                 }
                 else {
-                    graphics.setColor(Color.WHITE);
-                    for (int index = shapes.size() - 1; index >= 0; index--){
-                        if (shapes.get(index).contains(e.getX(), e.getY())) {
-                            graphics.fill(shapes.get(index));
-                            shapes.remove(index);
-                            break;
-                        }
+                    Random random = new Random();
+                    oldX = e.getX();
+                    oldY = e.getY();
+                    if (frame.configPanel.colors.getSelectedItem().equals("Black")){
+                        graphics.setColor(Color.BLACK);
                     }
-                    redrawShapes();
+                    else {
+                        Color color = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
+                        graphics.setColor(color);
+                    }
                 }
-                repaint();
+            }
+        });
+        this.addMouseMotionListener(new MouseMotionAdapter(){
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if(frame.freeMode){
+                    currentX = e.getX();
+                    currentY = e.getY();
+                    if (graphics != null){
+                        graphics.drawLine(oldX, oldY, currentX, currentY);
+                        repaint();
+                        oldX = currentX;
+                        oldY = currentY;
+                    }
+                }
             }
         });
     }
