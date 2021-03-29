@@ -1,35 +1,27 @@
 package Board;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class Board {
     private List<Token> tokens;
-    private boolean available = true;
     public Board(int n){
         tokens = new ArrayList<>();
         generateTokensOnBoard(n);
     }
     private void generateTokensOnBoard(int maxValue){
-        boolean[] leftValues = new boolean[maxValue];
-        boolean[] rightValues = new boolean[maxValue];
         Random random = new Random();
-        int leftValue;
-        int rightValue;
+        int k = 0;
         for (int i = 0; i < maxValue; i++){
-            do {
-                leftValue = random.nextInt(maxValue);
-            } while (leftValues[leftValue]);
-            do {
-                rightValue = random.nextInt(maxValue);
-            } while (rightValues[rightValue]);
-            leftValues[leftValue] = rightValues[rightValue] = true;
-            tokens.add(new Token("T" + (i + 1),leftValue + 1, rightValue + 1, random.nextInt(maxValue)));
+            for (int j = 0; j < maxValue; j++){
+                if (i != j){
+                    k += 1;
+                    tokens.add(new Token("T" + k, i + 1, j + 1, random.nextInt(maxValue) + 1));
+                }
+            }
         }
+        Collections.shuffle(tokens);
     }
-    public List<Token> getTokens() {
+    public synchronized List<Token> getTokens() {
         return tokens;
     }
     public void setTokens(List<Token> tokens) {
@@ -37,12 +29,26 @@ public class Board {
     }
     public synchronized Token pickToken(String name){
         System.out.println(this);
-        System.out.println(name + " choose a token based on its index:");
-        Scanner scanner = new Scanner(System.in);
-        int index = scanner.nextInt();
-        Token token = tokens.get(index - 1);
-        tokens.remove(index - 1);
+        int index;
+        do {
+            System.out.println(name + " choose a token based on its index:");
+            Scanner scanner = new Scanner(System.in);
+            index = scanner.nextInt();
+            index = verify(index);
+        } while (index == -1);
+        Token token = tokens.get(index);
+        tokens.remove(index);
         return token;
+    }
+    private int verify(int index){
+        String name = "T" + index;
+        for (Token token: tokens) {
+            if (token.getName().equals(name)){
+                return tokens.indexOf(token);
+            }
+        }
+        System.out.println("Invalid index");
+        return -1;
     }
     @Override
     public String toString() {
