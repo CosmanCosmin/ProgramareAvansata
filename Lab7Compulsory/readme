@@ -1,0 +1,4 @@
+Create classes in order to model the problem. You may assume that all possible tokens are initially available, having random values.
+Each player will have a name and they must perform in a concurrent manner, extracting repeatedly tokens from the board.
+Simulate the game using a thread for each player.
+Pay attention to the synchronization of the threads when extracting tokens from the board
