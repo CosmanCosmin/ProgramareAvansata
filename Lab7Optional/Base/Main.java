@@ -3,11 +3,12 @@ package Base;
 import Board.*;
 import Player.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Board board = new Board(4);
         System.out.println("How many players?(0, 1, 2)");
         Scanner scanner = new Scanner(System.in);
         int gameCase;
@@ -24,7 +25,12 @@ public class Main {
         }
         Player firstPlayer = new Player("Ionut");
         Player secondPlayer = new Player("Andrei");
-        new GameThread(firstPlayer, board, isFirstAI).start();
-        new GameThread(secondPlayer, board, isSecondAI).start();
+        List<Player> players = new ArrayList<>(); players.add(firstPlayer); players.add(secondPlayer);
+        Board board = new Board(1000, players);
+        Thread timer = new TimerThread(30);
+        timer.setDaemon(true);
+        timer.start();
+        new GameThread(0, board, isFirstAI).start();
+        new GameThread(1, board, isSecondAI).start();
     }
 }

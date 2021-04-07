@@ -1,17 +1,25 @@
 
 package Board;
 
+import Player.*;
+
 import java.util.*;
 
 public class Board {
-    private List<Token> tokens;
-    private boolean available = true;
-    public Board(int n){
+    private final List<Token> tokens;
+    private final List<Player> players;
+    private int playersTurn;
+    private int firstPlayer;
+    public boolean isGameOver = false;
+    public Board(int n, List<Player> players){
         tokens = new ArrayList<>();
+        this.players = players;
         generateTokensOnBoard(n);
     }
     private void generateTokensOnBoard(int maxValue){
         Random random = new Random();
+        firstPlayer = random.nextInt(players.size());
+        playersTurn = firstPlayer;
         int k = 0;
         for (int i = 0; i < maxValue; i++){
             for (int j = 0; j < maxValue; j++){
@@ -26,38 +34,97 @@ public class Board {
     public synchronized List<Token> getTokens() {
         return tokens;
     }
-    public void setTokens(List<Token> tokens) {
-        this.tokens = tokens;
-    }
-    public synchronized Token pickToken(String name, boolean isAIPicking){
-        while (!available){
-            try{
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+    public Token pickToken(Player player, boolean isAIPicking){
+        synchronized (this) {
+            while (!player.equals(players.get(playersTurn))) {
+                try {
+                    wait();
+                } catch (InterruptedException exception) {
+                    exception.printStackTrace();
+                }
             }
+            int index;
+            if (!isAIPicking) {
+                System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                System.out.println(this);
+                System.out.println(player);
+                do {
+                    System.out.println(player.getName() + " choose a token based on its index:");
+                    Scanner scanner = new Scanner(System.in);
+                    index = scanner.nextInt();
+                    index = verify(index);
+                } while (index == -1);
+            } else {
+                Random random = new Random();
+                index = random.nextInt(tokens.size());
+            }
+            Token token = tokens.get(index);
+            tokens.remove(index);
+            System.out.println(player.getName() + " picked " + token.getName());
+            if (playersTurn == 0) {
+                playersTurn = 1;
+            } else {
+                playersTurn = 0;
+            }
+            notify();
+            return token;
         }
-        available = false;
-        int index;
-        if (!isAIPicking) {
-            System.out.println(this);
-            do {
-                System.out.println(name + " choose a token based on its index:");
-                Scanner scanner = new Scanner(System.in);
-                index = scanner.nextInt();
-                index = verify(index);
-            } while (index == -1);
+    }
+    public void sumUpGame(int index){
+        synchronized (this) {
+            while (!players.get(index).equals(players.get(playersTurn))) {
+                try {
+                    wait();
+                } catch (InterruptedException exception) {
+                    exception.printStackTrace();
+                }
+            }
+            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            System.out.print(players.get(index));
+            System.out.println(players.get(index).getName() + " has " + players.get(index).getTokens().size() + " tokens ");
+            Score score = new Score(players.get(index));
+            System.out.println(players.get(index).getName() + " managed to get " + score.getScore() + " points");
+            players.get(index).setScore(score.getScore());
+            if (playersTurn == 0) {
+                playersTurn = 1;
+            } else {
+                playersTurn = 0;
+            }
+            notify();
+            isGameOver = true;
         }
-        else {
-            Random random = new Random();
-            index = random.nextInt(tokens.size());
+    }
+    public void determineWinner(int index){
+        synchronized (this) {
+            while (!players.get(index).equals(players.get(playersTurn))) {
+                try {
+                    wait();
+                } catch (InterruptedException exception) {
+                    exception.printStackTrace();
+                }
+            }
+            if (firstPlayer != index) {
+                System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                if (players.get(0).getScore() > players.get(1).getScore()) {
+                    System.out.println(players.get(0).getName() + " wins with a score of " +
+                            players.get(0).getScore());
+                } else {
+                    if (players.get(0).getScore() < players.get(1).getScore()) {
+                        System.out.println(players.get(1).getName() + " wins with a score of " +
+                                players.get(1).getScore());
+                    } else {
+                        System.out.println(players.get(0).getName() + " and " + players.get(1).getName()
+                                + " tie with a score of " + players.get(0).getScore());
+                    }
+                }
+            }
+            if (playersTurn == 0) {
+                playersTurn = 1;
+            } else {
+                playersTurn = 0;
+            }
+            notify();
         }
-        Token token = tokens.get(index);
-        tokens.remove(index);
-        System.out.println(name + " picked " + token.getName());
-        available = true;
-        notify();
-        return token;
     }
     private int verify(int index){
         String name = "T" + index;
@@ -68,6 +135,9 @@ public class Board {
         }
         System.out.println("Invalid index");
         return -1;
+    }
+    public List<Player> getPlayers() {
+        return players;
     }
     @Override
     public String toString() {

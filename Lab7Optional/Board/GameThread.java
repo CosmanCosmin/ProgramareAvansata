@@ -1,21 +1,20 @@
 package Board;
 
-import Player.*;
-
 public class GameThread extends Thread{
-    private final Player player;
+    private final int playerIndex;
     private final Board board;
     private final boolean isAI;
-    public GameThread(Player player, Board board, boolean isAI) {
-        this.player = player;
+    public GameThread(int playerIndex, Board board, boolean isAI) {
+        this.playerIndex = playerIndex;
         this.board = board;
         this.isAI = isAI;
     }
     @Override
     public void run() {
-        while (!board.getTokens().isEmpty()) {
-            player.addToken(board.pickToken(player.getName(), isAI));
+        while (board.getTokens().size() > 1) {
+            board.getPlayers().get(playerIndex).addToken(board.pickToken(board.getPlayers().get(playerIndex), isAI));
         }
-        System.out.print(player);
+        board.sumUpGame(playerIndex);
+        board.determineWinner(playerIndex);
     }
 }
