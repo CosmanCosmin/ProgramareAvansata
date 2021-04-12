@@ -1,0 +1,23 @@
+DROP TABLE IF EXISTS movie_genre;
+DROP TABLE IF EXISTS movies;
+DROP TABLE IF EXISTS genres;
+
+CREATE TABLE movies(
+    id SERIAL,
+    title VARCHAR(30),
+    release_date VARCHAR(30),
+    duration INT,
+    score DECIMAL,
+    PRIMARY KEY (id)
+     );
+
+CREATE TABLE genres(
+    id SERIAL,
+    name VARCHAR(30),
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE movie_genre(
+    movieID SERIAL REFERENCES movies(id),
+    genreID SERIAL REFERENCES genres(id)
+);
