@@ -18,6 +18,11 @@
             <artifactId>opencsv</artifactId>
             <version>5.4</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.spullara.mustache.java</groupId>
+            <artifactId>compiler</artifactId>
+            <version>0.9.7</version>
+        </dependency>
     </dependencies>
     <properties>
         <maven.compiler.source>15</maven.compiler.source>

@@ -1,6 +1,7 @@
 package DAO;
 
 import Database.*;
+import com.sun.source.tree.TryTree;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -190,5 +191,34 @@ public class MovieDAO implements DAO<Movie> {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+    }
+    public List<Movie> getTopRated(){
+        List<Movie> movies = new ArrayList<>();
+        try {
+            String topMovies =  "select movies.id, title, release_year, release_date, string_agg(distinct g.name, ', ') as genres," +
+                                " duration, language, string_agg(distinct d.name, ', ') as directors," +
+                                " string_agg(distinct a.name, ', ') as actors, score from movies join movie_genre mg" +
+                                " on movies.id = mg.movieID join genres g on g.id = mg.genreID join movie_director md" +
+                                " on movies.id = md.movieID join directors d on d.id = md.directorID join movie_actor ma" +
+                                " on movies.id = ma.movieID join actors a on a.id = ma.actorID" +
+                                " group by movies.id, score order by score desc limit 50";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(topMovies);
+            while(resultSet.next()){
+                movies.add(new Movie(resultSet.getString("id"),
+                                     resultSet.getString("title"),
+                                     resultSet.getInt("release_year"),
+                                     resultSet.getString("release_date"),
+                                     resultSet.getString("genres"),
+                                     resultSet.getInt("duration"),
+                                     resultSet.getString("language"),
+                                     resultSet.getString("directors"),
+                                     resultSet.getString("actors"),
+                                     resultSet.getFloat("score")));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return movies;
     }
 }

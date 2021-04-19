@@ -29,6 +29,7 @@ public class Main {
         for (Director director : directors) {
             System.out.println(director);
         }
+        new Report(movieDAO);
         connect.closeConnection();
     }
 }
